@@ -249,8 +249,8 @@
                 $exito = false;
 
                 $conProyecto->rollBack();
-                error_log("Ha ocurrido un error y no se ha podido crear el libro " . $ex->getTraceAsString());
-
+               error_log("Ha ocurrido un error y no se ha podido crear el libro " . $ex->getTraceAsString());
+               
                 echo "<div class=\"alert alert-danger\" role=\"alert\">
         Ha ocurrido una excepción: " . $ex->getMessage() . "</div>";
             }
