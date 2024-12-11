@@ -169,15 +169,25 @@
          */
         function findAllAuthors(): array
         {
-            $conProyecto = getConnection();
+            $array = array();
+            try {
+                $conProyecto = getConnection();
 
-            $pdostmt = $conProyecto->prepare("SELECT author_id, "
-                . "CONCAT_WS (' ', COALESCE(a.last_name, ''), COALESCE(a.first_name, ''), COALESCE(a.middle_name, '')) as completeName " .
-                " FROM authors a ORDER BY a.last_name");
+                $pdostmt = $conProyecto->prepare("SELECT author_id, "
+                    . "CONCAT_WS (' ', COALESCE(a.last_name, ''), COALESCE(a.first_name, ''), COALESCE(a.middle_name, '')) as completeName " .
+                    " FROM authors a ORDER BY a.last_name");
 
-            $pdostmt->execute();
-            $array = $pdostmt->fetchAll(PDO::FETCH_ASSOC);
+                $pdostmt->execute();
+                $array = $pdostmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            catch(Exception $ex){
+                error_log('No se han podido recuperar los autores: ' + $ex->getTraceAsString());
 
+            }
+            finally{
+                $conProyecto = null;
+                $pdostmt = null;
+            }
             return $array;
         }
 
@@ -239,9 +249,14 @@
                 $exito = false;
 
                 $conProyecto->rollBack();
+                error_log("Ha ocurrido un error y no se ha podido crear el libro " . $ex->getTraceAsString());
 
                 echo "<div class=\"alert alert-danger\" role=\"alert\">
         Ha ocurrido una excepción: " . $ex->getMessage() . "</div>";
+            }
+            finally{
+                $conProyecto = null;
+                $pdostmt = null;
             }
             return $exito;
         }
